@@ -2,11 +2,7 @@
 #include <string>
 
 #include "IO.h"
-
-double potential(double *energies)
-{
-	return -1;
-}
+#include "graph.h"
 
 int main(int argc, char const *argv[])
 {	
@@ -35,8 +31,15 @@ int main(int argc, char const *argv[])
 
 	for (int i = 0; i < Nconnect*2; ++i)
 	{
-		std::cout << "\t\t" << names[connections[i]] << " -- " << names[connections[i+1]] << std::endl;
+		std::cout << "\t\t" << names[connections[i]] << " <--> " << names[connections[i+1]] << std::endl;
 		i++;
+	}
+
+	int* test = test_array(Nstates);
+
+	for (int i = 0; i < Nstates*Nstates; ++i)
+	{
+		std::cout << test[i] << std::endl;
 	}
 
 	return 0;
