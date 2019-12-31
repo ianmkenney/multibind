@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <math.h>
+#include <map>
 
 int count_entries(char const *fname)
 {
@@ -16,6 +18,29 @@ int count_entries(char const *fname)
 	}
 	infile.close();
 	return entries;
+}
+
+std::map<std::string, double>* get_concentrations(char const *fname)
+{
+	std::ifstream infile(fname);
+	std::string line, entry;
+	std::string lig;
+	double concentration;
+	std::map<std::string, double>* conc = new std::map<std::string, double>;
+
+	while(getline(infile, line))
+	{
+		if (line[0] == '#' || line[0] == '\n') continue;
+		std::stringstream ss(line);
+		getline(ss, entry, ',');
+		lig = entry;
+		getline(ss, entry, ',');
+		concentration = std::stod(entry);
+		(*conc).insert(std::pair<std::string, double>(lig, concentration));
+	}
+
+	infile.close();
+	return conc;
 }
 
 std::string* collect_states(char const *fname, int* Nstates)
@@ -70,7 +95,7 @@ T graph_entries(char const* fname, int column, int lines)
 		}
 		if (typeid(U) == typeid(int))
 		{
-			int convert = std::stod(entry);
+			int convert = std::stoi(entry);
 			values[counter] = convert;
 		}
 
@@ -80,51 +105,45 @@ T graph_entries(char const* fname, int column, int lines)
 	return values;
 }
 
-// void collect_connections(char const* fname, int* Nconnect)
-// {
-// 	std::ifstream infile(fname);
-// 	std::string line, entry;
-// 	std::string s1, s2, ligand;
-// 	int s1i, s2i;
-// 	double value, variance, standard_state;
+template double* graph_entries<double*, double>(char const*, int, int);
+template int* graph_entries<int*, int>(char const*, int, int);
 
-// 	int counter = 0;
+template <>
+std::string* graph_entries<std::string*, std::string>(char const* fname, int column, int lines)
+{
+	std::ifstream infile(fname);
+	std::string line, entry;
 
-// 	while(getline(infile, line))
-// 	{
-// 		if (line[0] == '#' || line[0] == '\n') continue;
-// 		std::stringstream ss;
-// 		ss.str(line);
-// 		getline(ss, entry, ',');
-// 		s1 = entry;
-// 		getline(ss, entry, ',');
-// 		s2 = entry;
-// 		getline(ss, entry, ',');
-// 		value = std::stod(entry);
-// 		getline(ss, entry, ',');
-// 		variance = std::stod(entry);
-// 		getline(ss, entry, ',');
-// 		ligand = entry;
-// 		getline(ss, entry, ',');
-// 		standard_state = std::stod(entry);
+	std::string* values = new std::string[lines];
 
-// 		s1i = get_index(names, s1, Nstates);
-// 		s2i = get_index(names, s2, Nstates);
-// 		con[counter] = s1i;
-// 		con[counter+1] = s2i;
-// 		counter = counter+2;
-// 	}
+	int counter = 0;
 
-// 	infile.close();
-// }
+	while(getline(infile, line))
+	{
+		if (line[0] == '#' || line[0] == '\n') continue;
+		std::stringstream ss(line);
+		for (int i = 0; i < column; ++i)
+		{
+			getline(ss, entry, ',');
+		}
+		getline(ss, entry, ',');
 
-int* collect_connections(char const* fname,int* Nconnect)
+		std::string convert = entry;
+		values[counter] = convert;
+
+		counter++;
+	}
+	infile.close();
+	return values;
+}
+
+int* collect_connections(char const* fname, int* Nconnect)
 {
 	*Nconnect = count_entries(fname);
 	int* connections = new int[*Nconnect*2];
 
-	int* s1 = graph_entries <int*, int> ("../examples/input/4-state-diamond/graph.csv", 0, *Nconnect);
-	int* s2 = graph_entries <int*, int> ("../examples/input/4-state-diamond/graph.csv", 1, *Nconnect);
+	int* s1 = graph_entries <int*, int> (fname, 0, *Nconnect);
+	int* s2 = graph_entries <int*, int> (fname, 1, *Nconnect);
 
 	for (int i = 0; i < *Nconnect; ++i)
 	{
@@ -135,6 +154,54 @@ int* collect_connections(char const* fname,int* Nconnect)
 	return connections;
 }
 
+double* collect_deltas(char const* fname, double pH, std::map<std::string, double> &concentrations)
+{
+	int Nconnect = count_entries(fname);
+	double* delta_raw = graph_entries <double*, double> (fname, 2, Nconnect);
+	std::string* ligand = graph_entries <std::string*, std::string> (fname, 4, Nconnect);
+	double* standard = graph_entries <double*, double> (fname, 5, Nconnect);
+
+	double* deltas = new double[Nconnect];
+	std::string lig;
+
+	for (int i = 0; i < Nconnect; ++i)
+	{
+		lig = ligand[i];
+		if (lig == "H+") deltas[i] = log(10) * (pH - delta_raw[i]);
+		else if (lig == "helm") deltas[i] = delta_raw[i];
+		else deltas[i] = delta_raw[i] - log(concentrations[lig]/standard[i]);
+	}
+	return deltas;
+}
+
+double* collect_stdevs(char const* fname, double pH)
+{
+	int Nconnect = count_entries(fname);
+	double* stdev_raw = graph_entries <double*, double> (fname, 3, Nconnect);
+
+	for (int i = 0; i < Nconnect; ++i)
+	{
+		stdev_raw[i] = sqrt(stdev_raw[i]);
+	}
+
+	std::string* ligand = graph_entries <std::string*, std::string> (fname, 4, Nconnect);
+	double* standard = graph_entries <double*, double> (fname, 5, Nconnect);
+
+	double* stdev = new double[Nconnect];
+	std::string lig;
+
+	for (int i = 0; i < Nconnect; ++i)
+	{
+		lig = ligand[i];
+		if (lig == "H+") stdev[i] = log(10) * stdev_raw[i];
+		else if (lig == "helm") stdev[i] = stdev_raw[i];
+		else stdev[i] = stdev_raw[i];
+	}
+
+
+	return stdev;
+}
+
 int get_index(std::string *names, std::string name, int Nstates)
 {
 	for (int i=0 ; i < Nstates; i++)
@@ -143,6 +210,3 @@ int get_index(std::string *names, std::string name, int Nstates)
 	}
 	return -1;
 }
-
-template double* graph_entries<double*, double>(char const*, int, int);
-template int* graph_entries<int*, int>(char const*, int, int);
