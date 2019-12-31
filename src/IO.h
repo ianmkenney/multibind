@@ -3,12 +3,19 @@
 
 #include <string>
 
-int count_states(char const*);
-int count_connections(char const*);
+int count_entries(char const*);
 
-void collect_states(char const*, std::string*);
-void collect_connections(char const*, int, std::string*, int*, double*, double*);
+std::string* collect_states(char const*, int*);
+int* collect_connections(char const*, int*);
+double* collect_deltas(char const*);
+double* collect_stdevs(char const*);
+template <typename T, typename U> T graph_entries(char const*, int, int);
 
 int get_index(std::string*, std::string name, int);
+
+// template int* graph_entries<int*, int>(char const*, int, int);
+
+// template std::string* graph_entries<std::string*, std::string>(char const*, int, int);
+
 
 #endif
