@@ -6,6 +6,10 @@
 #include <math.h>
 #include <map>
 
+/*
+Read the contents of any csv that uses '#' as a comment character
+and returns the number of entries.
+*/
 int count_entries(char const *fname)
 {
 	std::ifstream infile(fname);

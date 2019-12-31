@@ -29,8 +29,8 @@ int main(int argc, char const *argv[])
 
 	std::string* names  = collect_states("../examples/input/4-state-diamond/states.csv", &Nstates);
 	int* connections = collect_connections("../examples/input/4-state-diamond/graph.csv", &Nconnect);
-	double* deltas = collect_deltas("../examples/input/4-state-diamond/graph.csv", 5, *concentrations);
-	double* stdev = collect_stdevs("../examples/input/4-state-diamond/graph.csv", 5);
+	double* deltas = collect_deltas("../examples/input/4-state-diamond/graph.csv", pH, *concentrations);
+	double* stdev = collect_stdevs("../examples/input/4-state-diamond/graph.csv", pH);
 	
 
 
