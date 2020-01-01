@@ -1,6 +1,7 @@
 #include "graph.h"
 #include <iostream>
 #include <math.h>
+#include <stdexcept>
 
 std::vector<int>* get_uv_neighbors(int src, int Nconnect, int Nstates, bool* visited, int* connections)
 {
@@ -86,35 +87,25 @@ void dijkstra(int Nstates, int Nconnect, double* ddelta, double* dvar, int src, 
 			}
 		}
 
-		int min_index;
-		double min_distance;
+		visited[current] = true;
 
-		if (Nneighbors >= 2)
-		{
-			min_index = (*neighbors)[0];
-			min_distance = energies[min_index];
-		}
-		else if (Nneighbors == 1)
-		{
-			visited[current] = true;
-			current = (*neighbors)[0];
-			continue;
-		}
-		else
-		{
-			break;
-		}
+		if (!unvisited(visited, Nstates)) break;
 
-		for (int i = 1; i < Nneighbors; ++i)
+		int min_index = __INT_MAX__;
+		double min_distance = __INT_MAX__;
+		bool is_neighbor;
+
+		for (int i = 0; i < Nstates; ++i)
 		{
-			neighbor_index = (*neighbors)[i];
-			if (energies[min_index] < min_distance)
+			if (!visited[i] && (var[i] < min_distance)) 
 			{
 				min_index = i;
-				min_distance = energies[min_index];
+				min_distance = var[i];
 			}
 		}
-		visited[current] = true;
+
+		if (min_index == __INT_MAX__) throw std::logic_error("Could not find an appropriate node");
+
 		current = min_index;
 	}
 	for (int i = 0; i < Nstates; ++i)

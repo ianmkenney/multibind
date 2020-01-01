@@ -34,14 +34,14 @@ int main(int argc, char const *argv[])
 	
 
 
-	std::cout << "\tFound " << Nstates << " states:" << std::endl;
+	std::cout << "\n\tFound " << Nstates << " states:" << std::endl;
 	for (int i = 0; i < Nstates; ++i)
 	{
 		std::cout << "\t\t" << names[i] << std::endl;
 	}
 	
 
-	std::cout << "\tFound " << Nconnect << " edges:" << std::endl;
+	std::cout << "\n\tFound " << Nconnect << " edges:" << std::endl;
 	for (int i = 0; i < Nconnect; ++i)
 	{
 		std::cout << "\t\t" <<  connections[i*2] << " <--> " << connections[i*2 + 1];
@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
 
 	dijkstra(Nstates, Nconnect, ddeltas, dvars, ref, connections, deltas, stdev);
 
-	std::cout << "\tPerforming Dijkstra shortest path algorithm relative to state " << ref << std::endl;
+	std::cout << "\n\tPerforming Dijkstra shortest path algorithm relative to state " << ref << std::endl;
 	std::cout << "\tMinimizing by variance" << std::endl;
 	std::cout << "\t\tName" << "\tEnergy" << "\tVar\n";
 	for (int i = 0; i < Nstates; ++i)
