@@ -6,6 +6,18 @@
 #include <math.h>
 #include <map>
 
+bool file_exists(char const* fname)
+{
+	std::ifstream infile(fname);
+	if (infile)
+	{
+		infile.close();
+		return true;
+	}
+	infile.close();
+	return false;
+}
+
 /*
 Read the contents of any csv that uses '#' as a comment character
 and returns the number of entries.
@@ -141,18 +153,18 @@ std::string* graph_entries<std::string*, std::string>(char const* fname, int col
 	return values;
 }
 
-int* collect_connections(char const* fname, int* Nconnect)
+int* collect_connections(char const* fname, int Nstates, std::string* names, int* Nconnect)
 {
 	*Nconnect = count_entries(fname);
 	int* connections = new int[*Nconnect*2];
 
-	int* s1 = graph_entries <int*, int> (fname, 0, *Nconnect);
-	int* s2 = graph_entries <int*, int> (fname, 1, *Nconnect);
+	std::string* s1 = graph_entries <std::string*, std::string> (fname, 0, *Nconnect);
+	std::string* s2 = graph_entries <std::string*, std::string> (fname, 1, *Nconnect);
 
 	for (int i = 0; i < *Nconnect; ++i)
 	{
-		connections[i*2] = s1[i];
-		connections[i*2 + 1] = s2[i];
+		connections[i*2] = get_index(names, s1[i], Nstates);
+		connections[i*2 + 1] = get_index(names, s2[i], Nstates);
 	}
 
 	return connections;
