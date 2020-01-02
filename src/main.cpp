@@ -1,8 +1,6 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <map>
-#include <vector>
 #include <math.h>
 
 #include "IO.h"
@@ -58,9 +56,23 @@ int main(int argc, char const *argv[])
 	std::cout << "\n\tPerforming Dijkstra shortest path algorithm relative to state " << ref << std::endl;
 	std::cout << "\tMinimizing by variance" << std::endl;
 	std::cout << "\t\tName" << "\tEnergy" << "\tVar\n";
+
 	for (int i = 0; i < Nstates; ++i)
 	{
 		std::cout << "\t\t" << i << "\t" << ddeltas[i] << "\t" << dvars[i] << std::endl;
+	}
+
+	double jac[Nstates * Nconnect];
+
+	jacobian(jac, connections, stdev, Nconnect, Nstates);
+
+	for (int k = 0; k < Nconnect; ++k)
+	{
+		for (int m = 0; m < Nstates; ++m)
+		{
+			std::cout << jac[m*Nconnect + k] << "   ";
+		}
+		std::cout << '\n';
 	}
 
 	return 0;

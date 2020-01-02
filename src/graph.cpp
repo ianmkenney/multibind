@@ -115,6 +115,32 @@ void dijkstra(int Nstates, int Nconnect, double* ddelta, double* dvar, int src, 
 	}
 }
 
+void jacobian(double* jac, int* connections, double* stdevs, int Nconnections, int Nstates)
+{
+	int i, j;
+	int djm, djk, dim, dik;
+	int factor;
+
+	for (int k = 0; k < Nconnections; ++k)
+	{
+		for (int m = 0; m < Nstates; ++m)
+		{
+			jac[m*Nconnections + k] = 0;
+			for (int p = 0; p < Nconnections; ++p)
+			{
+				i = connections[p*2];
+				j = connections[p*2 + 1];
+				djm = j == m;
+				djk = j == k;
+				dim = i == m;
+				dik = i == k;
+				factor = djm*djk - dim*djk - djm*dik + dim*dik;
+				jac[m*Nconnections + k] += -1/(stdevs[p] * stdevs[p]) * factor;
+			}
+		}
+	}
+}
+
 double potential(double* deltas, double* stdevs)
 {
 	return -1;
