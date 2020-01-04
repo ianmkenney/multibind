@@ -4,16 +4,16 @@
 #include <string>
 #include <map>
 
-bool file_exists(char const*);
+bool file_exists(std::string);
 
-int count_entries(char const*);
-std::map<std::string, double>* get_concentrations(char const *fname);
+int count_entries(std::string);
+std::map<std::string, double>* get_concentrations(std::string fname);
 
-std::string* collect_states(char const*, int*);
-int* collect_connections(char const*, int, std::string*, int*);
-double* collect_deltas(char const*, double, std::map<std::string, double>&);
-double* collect_stdevs(char const*, double);
-template <typename T, typename U> T graph_entries(char const*, int, int);
+std::string* collect_states(std::string, int*);
+int* collect_connections(std::string, int, std::string*, int*);
+double* collect_deltas(std::string, double, std::map<std::string, double>&);
+double* collect_stdevs(std::string, double);
+template <typename T, typename U> T graph_entries(std::string, int, int);
 
 int get_index(std::string*, std::string name, int);
 

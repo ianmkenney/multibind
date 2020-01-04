@@ -9,8 +9,9 @@ template <typename T> T get_pair_values(int, int, int*, T*, int, bool);
 void dijkstra(int, int, double*, double*, int, int*, double*, double*);
 
 void jacobian(double* jac, int* connections, double* stdevs, int Nconnections, int Nstates);
-double* grad_log_liklihood(double* energies, double* stdevs);
+void grad_log_liklihood(double* result, int* connections, double* energies, double* deltas, double* stdevs, int Nconnections);
 
+double* pseudo_inverse(double*, int, int);
 double potential(double* deltas, double* stdevs);
 
 #endif

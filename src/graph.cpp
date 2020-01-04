@@ -141,6 +141,29 @@ void jacobian(double* jac, int* connections, double* stdevs, int Nconnections, i
 	}
 }
 
+void grad_log_liklihood(double* result, int* connections, double* energies, double* deltas, double* stdevs, int Nconnections)
+{
+	int i, j;
+	double f, value;
+	for (int m = 0; m < Nconnections; ++m)
+	{
+		i = connections[m*2];
+		j = connections[m*2 + 1];
+		value = - 1 / pow(stdevs[m],2) * (energies[j] - energies[i] - deltas[m]);
+		result[i] = - value;
+		result[j] = value;
+	}
+}
+
+double* pseudo_inverse(double* matrix, int Nconnections, int Nstates)
+{
+	double* inverse = new double[Nconnections * Nstates];
+
+	for (int i = 0; i < Nconnections*Nstates; ++i) inverse[i] = 0;
+
+	return inverse;
+}
+
 double potential(double* deltas, double* stdevs)
 {
 	return -1;

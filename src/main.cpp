@@ -16,7 +16,9 @@ int main(int argc, char const *argv[])
 
 	std::map<std::string, double>* concentrations;
 
-	if (file_exists("../examples/input/4-state-diamond/concentrations.csv"))
+	std::string concentraion_file = "../examples/input/4-state-diamond/concentrations.csv";
+
+	if (file_exists(concentraion_file))
 	{
 		std::map<std::string, double>* concentrations = get_concentrations("../examples/input/4-state-diamond/concentrations.csv");
 	}
@@ -42,7 +44,7 @@ int main(int argc, char const *argv[])
 	std::cout << "\n\tFound " << Nconnect << " edges:" << std::endl;
 	for (int i = 0; i < Nconnect; ++i)
 	{
-		std::cout << "\t\t" <<  connections[i*2] << " <--> " << connections[i*2 + 1];
+		std::cout << "\t\t" <<  names[connections[i*2]] << " <--> " << names[connections[i*2 + 1]];
 		std::cout << "   --->   " << deltas[i] << " (" << pow(stdev[i],2) << ") kT\n";
 	}
 
@@ -59,12 +61,14 @@ int main(int argc, char const *argv[])
 
 	for (int i = 0; i < Nstates; ++i)
 	{
-		std::cout << "\t\t" << i << "\t" << ddeltas[i] << "\t" << dvars[i] << std::endl;
+		std::cout << "\t\t" << names[i] << "\t" << ddeltas[i] << "\t" << dvars[i] << std::endl;
 	}
 
 	double jac[Nstates * Nconnect];
 
 	jacobian(jac, connections, stdev, Nconnect, Nstates);
+
+	std::cout << std::endl;
 
 	for (int k = 0; k < Nconnect; ++k)
 	{

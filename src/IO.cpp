@@ -6,7 +6,7 @@
 #include <math.h>
 #include <map>
 
-bool file_exists(char const* fname)
+bool file_exists(std::string fname)
 {
 	std::ifstream infile(fname);
 	if (infile)
@@ -22,7 +22,7 @@ bool file_exists(char const* fname)
 Read the contents of any csv that uses '#' as a comment character
 and returns the number of entries.
 */
-int count_entries(char const *fname)
+int count_entries(std::string fname)
 {
 	std::ifstream infile(fname);
 	std::string line;
@@ -36,7 +36,7 @@ int count_entries(char const *fname)
 	return entries;
 }
 
-std::map<std::string, double>* get_concentrations(char const *fname)
+std::map<std::string, double>* get_concentrations(std::string fname)
 {
 	std::ifstream infile(fname);
 	std::string line, entry;
@@ -59,7 +59,7 @@ std::map<std::string, double>* get_concentrations(char const *fname)
 	return conc;
 }
 
-std::string* collect_states(char const *fname, int* Nstates)
+std::string* collect_states(std::string fname, int* Nstates)
 {
 	std::ifstream infile(fname);
 	std::stringstream ss;
@@ -85,7 +85,7 @@ std::string* collect_states(char const *fname, int* Nstates)
 }
 
 template <typename T, typename U>
-T graph_entries(char const* fname, int column, int lines)
+T graph_entries(std::string fname, int column, int lines)
 {
 	std::ifstream infile(fname);
 	std::string line, entry;
@@ -121,11 +121,11 @@ T graph_entries(char const* fname, int column, int lines)
 	return values;
 }
 
-template double* graph_entries<double*, double>(char const*, int, int);
-template int* graph_entries<int*, int>(char const*, int, int);
+template double* graph_entries<double*, double>(std::string, int, int);
+template int* graph_entries<int*, int>(std::string, int, int);
 
 template <>
-std::string* graph_entries<std::string*, std::string>(char const* fname, int column, int lines)
+std::string* graph_entries<std::string*, std::string>(std::string fname, int column, int lines)
 {
 	std::ifstream infile(fname);
 	std::string line, entry;
@@ -153,7 +153,7 @@ std::string* graph_entries<std::string*, std::string>(char const* fname, int col
 	return values;
 }
 
-int* collect_connections(char const* fname, int Nstates, std::string* names, int* Nconnect)
+int* collect_connections(std::string fname, int Nstates, std::string* names, int* Nconnect)
 {
 	*Nconnect = count_entries(fname);
 	int* connections = new int[*Nconnect*2];
@@ -170,7 +170,7 @@ int* collect_connections(char const* fname, int Nstates, std::string* names, int
 	return connections;
 }
 
-double* collect_deltas(char const* fname, double pH, std::map<std::string, double> &concentrations)
+double* collect_deltas(std::string fname, double pH, std::map<std::string, double> &concentrations)
 {
 	int Nconnect = count_entries(fname);
 	double* delta_raw = graph_entries <double*, double> (fname, 2, Nconnect);
@@ -190,7 +190,7 @@ double* collect_deltas(char const* fname, double pH, std::map<std::string, doubl
 	return deltas;
 }
 
-double* collect_stdevs(char const* fname, double pH)
+double* collect_stdevs(std::string fname, double pH)
 {
 	int Nconnect = count_entries(fname);
 	double* stdev_raw = graph_entries <double*, double> (fname, 3, Nconnect);
